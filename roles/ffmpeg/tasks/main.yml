@@ -111,4 +111,4 @@
       hash -r
 
   become: yes
-  become_user: vagrant
+  become_user: "{{ user_to_change }}"

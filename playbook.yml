@@ -2,6 +2,9 @@
 - hosts: vagrant
   become: yes
   remote_user: vagrant
+
   roles:
   - role: docker
   - role: ffmpeg
+    vars:
+      user_to_change: vagrant
