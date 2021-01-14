@@ -1,0 +1,114 @@
+- name: Update Apt
+  apt: update_cache=yes
+
+- name: Install Dependencies
+  apt: 
+    pkg:
+      - autoconf
+      - automake
+      - build-essential
+      - cmake
+      - git-core
+      - libass-dev
+      - libfreetype6-dev
+      - libgnutls28-dev
+      - libsdl2-dev
+      - libtool
+      - libva-dev
+      - libvdpau-dev
+      - libvorbis-dev
+      - libxcb1-dev
+      - libxcb-shm0-dev
+      - libxcb-xfixes0-dev
+      - pkg-config
+      - texinfo
+      - wget
+      - yasm
+      - zlib1g-dev
+
+- name: Install NASM
+  apt:
+    name: nasm
+
+- name: Install LIBX264
+  apt: 
+    name: libx264-dev
+
+- name: Install LIBX265
+  apt:
+    pkg:
+      - libx265-dev
+      - libnuma-dev
+
+- name: Install LIBVPX
+  apt:
+    name: libvpx-dev
+
+- name: Install LIBFDK-AAC
+  apt:
+    name: libfdk-aac-dev
+
+- name: Install libmp3lame
+  apt:
+    name: libmp3lame-dev
+
+- name: Install libopus
+  apt:
+    name: libopus-dev
+
+- name: Install libunistring-dev
+  apt:
+    name: libunistring-dev
+
+- block:
+
+  - name: Make ffmpeg_sources Directory
+    file:
+      path: $HOME/ffmpeg_sources
+      state: directory
+
+  - name: Make ffmpeg_build Build
+    file:
+      path: $HOME/ffmpeg_build
+      state: directory
+
+  - name: Make BIN Directory
+    file:
+      path: $HOME/bin
+      state: directory
+
+  - name: Download ffmpeg Snapshot
+    command: wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
+    args:
+      chdir: $HOME/ffmpeg_sources
+
+  - name: Extract ffmpeg Snapshot
+    command: tar xjvf ffmpeg-snapshot.tar.bz2
+    args:
+      chdir: $HOME/ffmpeg_sources
+
+  - name: Configure Ffmpeg
+    shell: >-
+      cd $HOME/ffmpeg_sources/ffmpeg &&
+      PATH="$HOME/bin:$PATH"
+      PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig"
+      ./configure --prefix="$HOME/ffmpeg_build"  --bindir="$HOME/bin" --pkg-config-flags="--static" --extra-cflags="-I$HOME/ffmpeg_build/include" --extra-ldflags="-L$HOME/ffmpeg_build/lib" --extra-libs="-lpthread -lm" --enable-gpl --enable-gnutls --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --disable-libaom --enable-nonfree
+
+  - name: Make ffmpeg
+    shell: >-
+      cd $HOME/ffmpeg_sources/ffmpeg &&
+      PATH="$HOME/bin:$PATH"
+      make
+    
+  - name: Make install ffmpeg
+    shell: >-
+      cd $HOME/ffmpeg_sources/ffmpeg &&
+      make install
+
+  - name: Hash
+    shell: >-
+      cd $HOME/ffmpeg_sources/ffmpeg &&
+      hash -r
+
+  become: yes
+  become_user: vagrant

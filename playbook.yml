@@ -4,3 +4,4 @@
   remote_user: vagrant
   roles:
   - role: docker
+  - role: ffmpeg
