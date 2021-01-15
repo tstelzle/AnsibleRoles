@@ -13,7 +13,7 @@
   apt: update_cache=yes name=docker-ce state=latest
 
 - name: Add Vagrant User To Docker
-  command: gpasswd -a vagrant docker
+  command: gpasswd -a "{{ user_for_docker }}" docker
 
 - name: Start Docker
   command: systemctl start docker

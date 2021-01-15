@@ -5,6 +5,8 @@
 
   roles:
   - role: docker
+    vars:
+      user_for_docker: vagrant
   - role: ffmpeg
     vars:
       user_to_change: vagrant
